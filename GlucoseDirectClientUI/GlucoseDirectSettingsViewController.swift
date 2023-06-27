@@ -14,9 +14,10 @@ import LoopKitUI
 public class GlucoseDirectSettingsViewController: UITableViewController {
     // MARK: Lifecycle
 
-    init(cgmManager: GlucoseDirectManager, displayGlucoseUnitObservable: DisplayGlucoseUnitObservable) {
+    init(cgmManager: GlucoseDirectManager, displayGlucosePreference: LoopKitUI.DisplayGlucosePreference) {
         self.cgmManager = cgmManager
-        self.glucoseUnit = displayGlucoseUnitObservable
+        self.displayGlucosePreference = displayGlucosePreference
+//        self.glucoseUnit = displayGlucoseUnitObservable
 
         super.init(style: .grouped)
         title = LocalizedString("CGM Settings")
@@ -112,7 +113,7 @@ public class GlucoseDirectSettingsViewController: UITableViewController {
                 case .glucose:
                     let cell = tableView.dequeueReusableCell(withIdentifier: "value", for: indexPath) as! ValueStyleCell
                     cell.textLabel?.text = LocalizedString("Glucose")
-                    cell.detailTextLabel?.text = quantityFormatter.string(from: latestGlucoseSample.quantity, for: glucoseUnit.displayGlucoseUnit)
+                    cell.detailTextLabel?.text = quantityFormatter.string(from: latestGlucoseSample.quantity)
 
                     return cell
                 case .trend:
@@ -196,7 +197,8 @@ public class GlucoseDirectSettingsViewController: UITableViewController {
 
     // MARK: Internal
 
-    let glucoseUnit: DisplayGlucoseUnitObservable
+    let displayGlucosePreference: LoopKitUI.DisplayGlucosePreference
+//    let glucoseUnit: DisplayGlucoseUnitObservable
     let cgmManager: GlucoseDirectManager
 
     @objc func doneTapped(_ sender: Any) {
@@ -241,7 +243,7 @@ public class GlucoseDirectSettingsViewController: UITableViewController {
     private var appLogo: UIImage? = UIImage(named: "glucose-direct", in: FrameworkBundle.own, compatibleWith: nil)!.imageWithInsets(insets: UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0))
 
     private var quantityFormatter: QuantityFormatter {
-        return QuantityFormatter()
+        return QuantityFormatter(for: displayGlucosePreference.unit)
     }
 
     private var dateFormatter: DateFormatter {
@@ -296,7 +298,7 @@ class ValueStyleCell: UITableViewCell {
 extension UIImage {
     func imageWithInsets(insets: UIEdgeInsets) -> UIImage? {
         UIGraphicsBeginImageContextWithOptions(CGSize(width: size.width + insets.left + insets.right, height: size.height + insets.top + insets.bottom), false, scale)
-        let _ = UIGraphicsGetCurrentContext()
+        _ = UIGraphicsGetCurrentContext()
         let origin = CGPoint(x: insets.left, y: insets.top)
 
         draw(at: origin)
